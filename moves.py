@@ -2,6 +2,10 @@ import chess
 from evaluation import *
 from typing import List
 
+MATE_SCORE     = 1000000000
+MATE_THRESHOLD =  999000000
+
+
 def aiMove(board):
     depth=3
     move = minimax_root(depth, board)
@@ -17,6 +21,13 @@ def order(board: chess.Board)->List[chess.Move]:
     return list(in_order)
 
 def minimax(depth: int, alpha:float,beta:float,board: chess.Board,maximising)->float:
+    if board.is_checkmate():
+        # The previous move resulted in checkmate
+        return -MATE_SCORE if maximising else MATE_SCORE
+    # When the game is over and it's not a checkmate it's a draw
+    # In this case, don't evaluate. Just return a neutral result: zero
+    elif board.is_game_over():
+        return 0
     if depth==0:
         return eval(board)
     moves=order(board)
@@ -55,6 +66,5 @@ def minimax_root(depth: int, board: chess.Board) -> chess.Move:
         elif not maximize and val <= best_move_val:
             best_move_val = val
             best_move = move
-    print(best_move_val)
     return best_move
     
