@@ -51,8 +51,9 @@ def minimax(depth: int, alpha:float,beta:float,board: chess.Board,maximising)->f
     
     elif board.is_game_over():
         return 0
+    
     if depth==0:
-        return quiescence_search(alpha, beta)
+        return quiescence_search(alpha, beta,board)
     moves=order(board)
     if maximising:
         val=float("-inf")
