@@ -4,8 +4,11 @@ import argparse
 from moves import aiMove
 
 
-# python lichess-bot.py -u
+
+# py -m venv venv
 # venv\Scripts\activate  
+# python lichess-bot.py -u
+
 def talk():
     """
     The main input/output loop.

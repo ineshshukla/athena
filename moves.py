@@ -20,16 +20,39 @@ def order(board: chess.Board)->List[chess.Move]:
     )
     return list(in_order)
 
+
+def quiescence_search( alpha:float,beta:float,board: chess.Board):
+    stand_pat = eval(board)
+
+    if stand_pat >= beta:
+        return beta
+    if alpha < stand_pat:
+        alpha = stand_pat
+
+    legal_captures = [move for move in board.legal_moves if board.is_capture(move)]
+
+    for move in legal_captures:
+        board.push(move)
+        score = -quiescence_search(-beta, -alpha, board)
+        board.pop()
+
+        if score >= beta:
+            return beta
+
+        if score > alpha:
+            alpha = score
+
+    return alpha
+
 def minimax(depth: int, alpha:float,beta:float,board: chess.Board,maximising)->float:
     if board.is_checkmate():
         # The previous move resulted in checkmate
         return -MATE_SCORE if maximising else MATE_SCORE
-    # When the game is over and it's not a checkmate it's a draw
-    # In this case, don't evaluate. Just return a neutral result: zero
+    
     elif board.is_game_over():
         return 0
     if depth==0:
-        return eval(board)
+        return quiescence_search(alpha, beta)
     moves=order(board)
     if maximising:
         val=float("-inf")
