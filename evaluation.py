@@ -120,7 +120,7 @@ def square_to_coord(square):
           48:(1,0), 49:(1,1), 50:(1,2), 51:(1,3), 52:(1,4), 53:(1,5), 54:(1,6), 55:(1,7),
           56:(0,0), 57:(0,1), 58:(0,2), 59:(0,3), 60:(0,4), 61:(0,5), 62:(0,6), 63:(0,7)}[square]
 
-def position_val(board: chess.Board, square: chess.Square, piece : chess.Piece):
+def position_val(board: chess.Board, square: chess.Square, piece : chess.Piece,end_game):
     x, y = square_to_coord(square)
     if piece is None:
         return 0
@@ -135,7 +135,10 @@ def position_val(board: chess.Board, square: chess.Square, piece : chess.Piece):
     elif piece.piece_type == chess.QUEEN:
         return queen_white[x][y] if piece.color == chess.WHITE else queen_black[x][y]
     elif piece.piece_type == chess.KING:
-        return king_white[x][y] if piece.color == chess.WHITE else king_black[x][y]
+        if end_game:
+            return king_end_game_white[x][y] if piece.color == chess.WHITE else king_end_game_black[x][y]
+        else:
+            return king_white[x][y] if piece.color == chess.WHITE else king_black[x][y]
 
     
 def evaluate_capture(board: chess.Board, move: chess.Move) -> float:
@@ -156,6 +159,7 @@ def evaluate_capture(board: chess.Board, move: chess.Move) -> float:
 
 def eval(board:chess.Board):
     evaluation=0
+    end_game = check_end_game(board)
     for square in chess.SQUARES:
         x, y = square_to_coord(square)
         piece = board.piece_at(square)
@@ -170,21 +174,22 @@ def eval(board:chess.Board):
                 if piece_above is not None and piece.piece_type==chess.PAWN and piece_above.piece_type==chess.PAWN:  #if doubled pawn then value of pawn halfed
                     c=1/2                                       
                 evaluation+=c*piece_value[piece.piece_type]
-                evaluation+=position_val(board,square,piece) 
+                evaluation+=position_val(board,square,piece,end_game ) 
             else:
                 c=1
                 if piece_below is not None and piece.piece_type==chess.PAWN and piece_below.piece_type==chess.PAWN:  #if doubled pawn then value of pawn halfed
                     c=1/2
                 evaluation-=c*piece_value[piece.piece_type]
-                evaluation-=position_val(board,square,piece)  
+                evaluation-=position_val(board,square,piece,end_game)  
     return evaluation
 
-def move_value(board: chess.Board, move: chess.Move) -> float:
+def move_value(board: chess.Board, move: chess.Move,end_game) -> float:
+    end_game=check_end_game(board)
     if move.promotion is not None:
         return float("inf") if board.turn == chess.WHITE else -float("inf")
     try:
         piece=board.piece_at(move.from_square)
-        position = position_val(board,move.to_square,piece)- position_val(board,move.from_square,piece)
+        position = position_val(board,move.to_square,piece,end_game)- position_val(board,move.from_square,piece,end_game)
     except:
         print(f"A piece was expected at {move.from_square}")
 
@@ -197,3 +202,23 @@ def move_value(board: chess.Board, move: chess.Move) -> float:
         return -current_value
 
     return current_value
+
+def check_end_game(board: chess.Board) -> bool:
+    """
+    - Both sides have no queens or
+    - Every side which has a queen has  no other pieces or one minorpiece maximum.
+    """
+    queens = 0
+    minors = 0
+
+    for square in chess.SQUARES:
+        piece = board.piece_at(square)
+        if piece and piece.piece_type == chess.QUEEN:
+            queens += 1
+        if piece and ( piece.piece_type == chess.BISHOP or piece.piece_type == chess.KNIGHT):
+            minors += 1
+
+    if queens == 0 or (queens == 2 and minors <= 1):
+        return True
+
+    return False
