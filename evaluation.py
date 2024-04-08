@@ -157,9 +157,10 @@ def evaluate_capture(board: chess.Board, move: chess.Move) -> float:
     return piece_value[captured_piece.piece_type] - piece_value[capturing_piece.piece_type]
 
 
-def eval(board:chess.Board):
+def eval(board:chess.Board,color:int):
     evaluation=0
     end_game = check_end_game(board)
+    central_squares = [chess.D4, chess.E4, chess.D5, chess.E5]
     for square in chess.SQUARES:
         x, y = square_to_coord(square)
         piece = board.piece_at(square)
@@ -175,13 +176,20 @@ def eval(board:chess.Board):
                     c=1/2                                       
                 evaluation+=c*piece_value[piece.piece_type]
                 evaluation+=position_val(board,square,piece,end_game ) 
+                if square in central_squares and not end_game:
+                    evaluation+=25
             else:
                 c=1
                 if piece_below is not None and piece.piece_type==chess.PAWN and piece_below.piece_type==chess.PAWN:  #if doubled pawn then value of pawn halfed
                     c=1/2
                 evaluation-=c*piece_value[piece.piece_type]
-                evaluation-=position_val(board,square,piece,end_game)  
-    return evaluation
+                evaluation-=position_val(board,square,piece,end_game) 
+                if square in central_squares and not end_game:
+                    evaluation-=25 
+    if color==1:
+        return evaluation
+    else :
+        return -evaluation
 
 def move_value(board: chess.Board, move: chess.Move,end_game) -> float:
     end_game=check_end_game(board)
@@ -198,8 +206,6 @@ def move_value(board: chess.Board, move: chess.Move,end_game) -> float:
         capture_value = evaluate_capture(board, move)
 
     current_value = capture_value + position
-    if board.turn == chess.BLACK:
-        return -current_value
 
     return current_value
 
