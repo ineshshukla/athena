@@ -1,5 +1,5 @@
 # Athena
-Athena is a Python-based chess engine using minimax algorithm with alpha-beta pruning, piece-square tables, Simplified Evaluation Function and move ordering
+Athena is a Python-based chess engine using negamax algorithm with alpha-beta pruning, piece-square tables, Simplified Evaluation Function and move ordering
 
 ### Features
 ---------
@@ -10,7 +10,7 @@ Athena is a Python-based chess engine using minimax algorithm with alpha-beta pr
 - **UCI Protocol Support:** Implements a slice of the Universal Chess Interface (UCI) to allow interaction with chess GUIs like lichess.org.
 - **Command-line Interface:** Provides a simple command-line user interface for playing chess against the engine.
 
-
+---
 ### Use it via Command Line
 ---------
 Start the engine with:
@@ -30,7 +30,7 @@ Start the engine with:
 
 Your move (e.g. g1h3):
 ```
-
+---
 
 
 ## UCI Engine
@@ -41,8 +41,9 @@ Start the engine with:
 
 The engine supports the UCI protocol for communication with compatible GUIs. Refer to the UCI interface documentation for more information on interaction.
 
-
+---
 ## Lichess.org
 ---------
 You can play against the engine on lichess.org using the ShailChoksi/lichess-bot bridge and a BOT account. See the section on lichess.org in the Usage instructions for more details.
+You can also look the bot up on lichess as "Athena-AI".
 
